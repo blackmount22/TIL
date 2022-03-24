@@ -14,7 +14,9 @@ RDBMS에서 사용하는 Index 는 B-Tree 에서 파생된 B+Tree 를 사용해�
 ### Index 작동 원리
 
 `SELECT *`
+
 `FROM Employee`
+
 `WHERE empNo = 9000;`
 
 데이터 파일의 블록이 10만개 일 때, 위 SQL 문을 수행 시에 
