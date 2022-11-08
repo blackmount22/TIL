@@ -1,6 +1,4 @@
 
-[##_Image|kage@zgpod/btrQJibNqvi/U7VriOIbWIkGpJ4VMBZmN1/img.png|CDM|1.3|{"originWidth":403,"originHeight":522,"style":"alignCenter","filename":"캡처.PNG"}_##]
-
 NICE 에서 제공해주는 본인인증 서비스를 적용해야 하는 상황이 있었다.
 
 API 개발가이드는 일단 JAVA 언어 기반으로만 예시코드를 제공해주는 상황으로 C# 적용 시 암호화 처리 후 직접 암호화가 잘 되었는지 JAVA 코드라 비교해야 하는 작업이 필요했다.
@@ -142,7 +140,7 @@ private string GetNiceApiEncryptToken()
         resultCode = jTokenHeader.SelectToken("GW_RSLT_CD").ToString();
 
         // 성공시 키 발급 처리
-        if (resultCode == "1200")
+        if (resultCode 성공시)
         {
             // 대칭키
             string strValue = req_dtim.Trim() + req_no.Trim() + token_val.Trim();
