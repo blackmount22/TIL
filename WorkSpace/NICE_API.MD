@@ -1,5 +1,5 @@
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e0991752-5e90-4295-a726-c6943334f6db/Untitled.png)
+[##_Image|kage@zgpod/btrQJibNqvi/U7VriOIbWIkGpJ4VMBZmN1/img.png|CDM|1.3|{"originWidth":403,"originHeight":522,"style":"alignCenter","filename":"캡처.PNG"}_##]
 
 NICE 에서 제공해주는 본인인증 서비스를 적용해야 하는 상황이 있었다.
 
