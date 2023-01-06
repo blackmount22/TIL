@@ -282,3 +282,61 @@ deleteBoard(@Param('id') id:string): void {
     this.boardsService.deleteBoard(id);
 }
 ```
+**3) 특정 게시물 업데이트하기** 
+
+**Service**
+
+```jsx
+updateBoardStatus(id: string, status: BoardStatus): Board {
+	const board = getBoadByID(id);
+	board.status = status;
+	return board;
+}
+```
+
+**Controller**
+
+```jsx
+@Patch('/:id/status')
+updateBoardStatus(
+	@Param('id') id:string,
+	@Body('status') status:BoardStatus,
+) {
+	return this.boardService.updateBoardStatus(id, status);
+}
+```
+
+---
+
+### NestJS Pipes
+
+Pipe란 @injectable() 데코레이터로 주석이 달린 클래스
+
+→ 파이프는 data transformation 과 data validation을 위해서 사용
+
+→ 컨트롤러 경로 처리기에 의해 처리되는 인수에 대해 작동
+
+clinet → Request → **Pipe (중간 가공 처리) → 성공 시,** Handler로 (Controller)
+
+- Data Transformation
+    
+    ex) string ‘7’ ⇒ int 7로 변경
+    
+- Data validation ?
+    
+    ex) 만약 길이가 10자 이하여야 하는데 10자 이상되면 에러 처리로
+    
+
+**Pipe 사용 방법**
+
+1) Handler-level Pipes
+
+→ 모든 파라미터에 적용되는 pipe
+
+2) Parameter-level Pipes
+
+→ 각 파라미터에 적용 되는 pipie
+
+3) Global-level Pipes
+
+→ Client의 모든 요청에 적용되는 pipe, main.ts 에 넣어주면 된다.
