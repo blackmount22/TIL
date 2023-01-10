@@ -340,3 +340,56 @@ clinet → Request → **Pipe (중간 가공 처리) → 성공 시,** Handler�
 3) Global-level Pipes
 
 → Client의 모든 요청에 적용되는 pipe, main.ts 에 넣어주면 된다.
+---
+
+### 유효성 체크 Pipe
+
+1) class-validator, class-transformer 모듈을 추가 설치
+
+```jsx
+npm install class-validator class-transformer --save
+```
+
+```jsx
+//DTO 에서 @IsNotEmpty() 로 빈 값 여부 체크
+export class CreateBoardDto {
+    @IsNotEmpty()
+    title: string;
+
+    @IsNotEmpty()
+    description: string;
+}
+
+// Controller에서 등록이 필요
+@Post()
+@UsePipes(ValidationPipe)
+createBoard(
+    @Body() createBoardDto: CreateBoardDto
+): Board {
+    return this.boardsService.createBoard(createBoardDto);
+}
+```
+
+### 특정 게시물을 찾을 때 없는 경우 결과 값 처리
+
+```tsx
+getBoardByID(id: string) : Board{
+     const found = this.boards.find((board) => board.id === id);
+
+     if(!found) {
+        throw new NotFoundException(`Can't find Board with id ${id}`);
+     }
+
+     return found;
+}
+```
+
+---
+
+### 커스텀 파이프를 이용한 유효성 체크
+
+- **커스텀 파이프 구현 방법**
+    
+    → PipeTransform 인터페이스를 구현해줘야한다.
+    
+    → transform() 메소드 // 첫번째 파라미터는 처리가 된 인자의 value, 두번째 파라미터는 인자에 대한 메타 데이터를 포함한 객체
