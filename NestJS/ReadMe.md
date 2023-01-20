@@ -393,3 +393,113 @@ getBoardByID(id: string) : Board{
     → PipeTransform 인터페이스를 구현해줘야한다.
     
     → transform() 메소드 // 첫번째 파라미터는 처리가 된 인자의 value, 두번째 파라미터는 인자에 대한 메타 데이터를 포함한 객체
+
+---
+
+### TypeORM이란?
+
+TypeORM은 node.js에서 실행되고 TypeScript로 작성된 객체 관계형 매퍼 라이브러리이다.
+
+### ORM(Object Relational Mapping) 이란?
+
+- 객체와 관계형 데이터베이스의 데이터를 자동으로 변형 및 연결하는 작업이다.
+- ORM을 이용한 개발은 객체와 데이터베이스의 변형에 유연하게 사용할 수 있다.
+
+→ Object 객체와 <-> 관계형 DataBase 를 매핑
+
+- **TypeORM vs Pure JavaScript**
+    
+    ```jsx
+    // TypeORM
+    const boards = Board.find({title:'Hello', status:'PUBLIC'});
+    
+    // Pure Javascript
+    db.query(SELECT * FROM boards WHERE title="Hello" AND status="PUBLIC", (err, result) => 
+    {
+    	if(err) {
+    		throw new Error('Error!')
+    	}
+    	boards = result.rows;
+    })
+    ```
+    
+
+### TypeORM 특징과 이점
+
+ - 모델을 기반으로 데이터베이스 테이블 체계를 자동 생성
+
+ - 데이터베이스에서 개체를 쉽게 삽입, 업데이트 및 삭제 할 수 있다.
+
+ - 테이블 간 매핑(일대일, 일대 다 및 다 대다)을 만든다.
+
+ - 간단한 CLI 명령을 제공한다.
+
+ - TypeORM은 간단한 코딩으로 ORM 프레임 워크를 사용하기 쉽다.
+
+ - TypeORM은 다른 모듈과 쉽게 통합된다.
+
+---
+
+### TypeORM 사용을 위한 모듈
+
+1) @nestjs/typeorm // NestJS에서 TypeORM을 사용하기 위해 연동해주는 모듈
+
+2) typeorm // TypeORM 모듈
+
+3) pg // Postgres 모듈
+
+// https://docs.nestjs.com/techniques/database
+
+```jsx
+npm install pg typeorm @nestjs/typeorm --save
+```
+
+- **TypeORM 애플리케이션에 연결하기**
+    
+    1) TypeORM 설정파일 생성 
+    
+     → src/configs/typeorm.configs.ts
+    
+    2) typeORM 설정파일 작성
+    
+    3) Root Module에서 Import 하기 (app.module.ts에 import)
+    
+    ```jsx
+    @Module({
+      imports: [
+        TypeOrmModule.forRoot(typeORMConfig),
+        BoardsModule],
+    }) 
+    ```
+    
+
+---
+
+### Entity 데코레이터 (Board 클래스 기준)
+
+ - @Entity() Board 클래스가 엔티티임을 나타내는데 사용 // CREATE TABLE Board 부분
+
+ - @PrimaryGeneratedColumn() id 열이 기본키임을 나타내는 데 사용
+
+ - @Column()
+
+---
+
+### Repository
+
+ - 엔티티 개체와 함께 작동하며, 엔티티 찾기, 삽입, 업데이트 삭제 등을 처리
+
+USER → Request → Controller → SERVICE → Repository(DB 관련 일)
+
+---
+
+### Service에 Repository 넣어주기 (Repository Injection)
+
+```jsx
+// Controller에서 Service 호출하듯
+// Service 에서 Repository 똑같이 Injection 처리
+constructor(
+    @InjectRepository(BoardRepository)
+    private boardRepository:BoardRepository
+){}
+```
