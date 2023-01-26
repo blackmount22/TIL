@@ -503,3 +503,80 @@ constructor(
     private boardRepository:BoardRepository
 ){}
 ```
+
+---
+
+### 게시물 생성하기
+
+**board.service.ts**
+
+```jsx
+async createBoard(createBoardDTO: CreateBoardDto) : Promise<Board> {
+	const {title, description} = createBoardDto;
+
+	const board = this.boardRepository.create({
+		title,
+		description,
+		status: BoardStatus.PUBLIC
+	})
+
+	await this.boardRepository.save(board);
+	return board;
+}
+```
+
+**board.controller.ts**
+
+```jsx
+@Post()
+@UsePipes(ValidationPipe)
+createBoard(@Body() createBoardDto: CreateBoardDto): Promise<Board> {
+	return this.boardsService.createBoard(createBoardDto);
+}
+```
+
+**board.repository.ts**
+
+```jsx
+@EntityRepository(Board)
+export class BoardRepository extends Repository<Board> {
+    async createBoard(createBoardDto: CreateBoardDto) : Promise<Board>{
+        const {title, description} = createBoardDto;
+
+        const board = this.create({
+            title,
+            description,
+            status: BoardStatus.PUBLIC
+        })
+
+        await this.save(board);
+        return board;
+    }
+}
+```
+
+repository.ts 에서 DB create를 처리하므로, service.ts는 아래와 같이 재 수정 필요
+
+```jsx
+createBoard(createBoardDto: CreateBoardDto) : Promise<Board>{
+    return this.boardRepository.createBoard(createBoardDto);
+}
+```
+
+---
+
+### 게시물 삭제하기
+
+ - remove() : 무조건 존재하는 아이템을 remove 메소드를 이용해서 지워야한다, 그러지 않으면 에러가 발생.
+
+ - delete() : 만약 아이템이 존재하면 지우고 존재하지 않으면 아무런 영향이 없다.
+
+**board.service.ts**
+
+```jsx
+async deleteBoard(id:number): Promise<void>{
+	const result = await 
+}
+```
+
+---
