@@ -580,3 +580,52 @@ async deleteBoard(id:number): Promise<void>{
 ```
 
 ---
+### 게시물 업데이트
+
+**board.service.ts**
+
+```jsx
+async updateBoardStatus(id: number, status:BoardStatus): Promise<Board> {
+	const board = await this.getBoardByID(id);
+	
+	board.status = status;
+	await this.boardRepository.save(board);
+
+	return board;
+}
+```
+
+**board.controller.ts**
+
+```jsx
+@Patch('/:id/status')
+updateBoardStatus{
+	@Param('id', ParseIntPipe) id:number,
+	@Body('status', BoardStatusValidationPipe) status: BoardStatus,
+} {
+	return this.boardService.updateBoardStatus(id, status);
+}
+```
+
+---
+
+### 모든 게시물 가져오기
+
+**board.service.ts**
+
+```jsx
+async getAllBoards() : Promise<Board[]> {
+	return this.boardRepository.
+}
+```
+
+**board.controller.ts**
+
+```jsx
+@Get('/')
+getAllBoards(): Promise<Board[]>{
+	this.boardService.getAllBoards();
+}
+```
+
+---
