@@ -92,3 +92,57 @@ export class AuthService {
     ) {}
 }
 ```
+---
+### 회원 가입 기능 구현
+
+**user.repository.ts**
+
+```jsx
+@EntityRepository(User)
+export class UserRepository extends Repository<User>{
+    async createUser(authCredentialsDto: AuthCredentialsDto): Promise<void>{
+        const {username, password} = authCredentialsDto;
+        const user = this.create({ username, password });
+        await this.save(user);
+    }
+}
+```
+
+**auth/dto/auth-credential.dto.ts**
+
+```jsx
+export class AuthCredentialsDto {
+    username: string;
+    password: string;
+}
+```
+
+**auth.service.ts**
+
+```jsx
+@Injectable()
+export class AuthService {
+    constructor(
+        @InjectRepository(UserRepository)
+        private userRepository: UserRepository,
+    ) {}
+
+    async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
+        return this.userRepository.createUser(authCredentialsDto);
+    }
+}
+```
+
+**auth.controller.ts**
+
+```jsx
+@Controller('auth')
+export class AuthController {
+    constructor( private authService:AuthService){}
+
+    @Post('/signup')
+    signUp(@Body() authCredentialsDto: AuthCredentialsDto): Promise<void> {
+        return this.authService.signUp(authCredentialsDto);
+    }
+}
+```
