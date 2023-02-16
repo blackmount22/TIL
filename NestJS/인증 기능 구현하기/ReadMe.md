@@ -146,3 +146,42 @@ export class AuthController {
     }
 }
 ```
+---
+### 유저 데이터 유효성 체크
+
+원하는 이름의 길이, 비밀번호 길이 같은 유효성 체크를 할 수 있게 각 Columnn에 맞는 조건을 넣어주기
+
+**Class-validator 모듈 사용**
+
+**auth-credentials.ts**
+
+```jsx
+export class AuthCredentialsDto {
+    @IsString()
+    @MinLength(4)
+    @MaxLength(20)
+    username: string;
+
+    @IsString()
+    @MinLength(4)
+    @MaxLength(20)
+    //영어, 숫자만 가능한 유효성 체크
+    @Matches(/^[a-zA-Z0-9]*$/, {
+        message: 'password only accepts english and number'
+    })
+    password: string;
+}
+```
+
+**ValidationPipe**
+
+요청이 컨트롤러에 있는 핸들러로 들어왔을 때 Dto에 있는 유효성 조건에 맞게 체크를 해주려면 ValidationPepe를 넣어주기
+
+**auth.controller.ts**
+
+```jsx
+@Post('/signup')
+signUp(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto): Promise<void> {
+    return this.authService.signUp(authCredentialsDto);
+}
+```
