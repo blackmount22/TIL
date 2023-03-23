@@ -185,3 +185,94 @@ signUp(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto): Promise<vo
     return this.authService.signUp(authCredentialsDto);
 }
 ```
+---
+### 유저 이름에 유니크한 값 주기
+
+1) repository 에서 findOne 메소드를 이용
+
+2) database 레벨에서 같은 이름을 가진 유저가 있다면 에러 처리
+
+**user.entity.ts**
+
+```jsx
+@Unique(['username'])
+```
+
+원하는 에러 처리 
+
+**user.repository.ts**
+
+```jsx
+try {
+    await this.save(user);
+} catch (error) {
+    if(error.code === '23505') {
+        throw new ConflictException('Existing username')
+    } else {
+        throw new InternalServerErrorException();
+    }
+}
+```
+
+---
+
+### 비밀번호 암호화 하기
+
+**bcryptjs 모듈 사용 (암호화 모듈)**
+
+```bash
+$ npm install bcryptjs --save
+```
+
+1) 원본 비밀번호를 저장
+
+2) 비밀번호 암호화 키 사용 (알고리즘 + 암호화 키)
+
+3) SHA256 > Hash 저장 // 단방향, 복호화 불가
+
+ / Hash 한 값을 다음에도 동일하게 hash 것과 동일한지 비교
+
+5) 솔트(salt) + 비밀번호(Plain Password) 를 Hash 암호화 해서 처리
+
+ 예) 1234 ==⇒ salt_1234
+
+        letmein ==⇒ salt_letmein
+
+---
+
+**user.repository.ts**
+
+```jsx
+const salt = await bcrypt.genSalt();
+const hashedPassword = await bcrypt.hash(password, salt);
+
+const user = this.create({ username, password:hashedPassword });
+```
+
+---
+
+### 로그인 기능 구현하기
+
+**user.service.ts**
+
+```jsx
+async signIn(authCredentialsDto: AuthCredentialsDto): Promise<string> {
+	const { username, password } = authCredentialsDto;
+	const user = await this.userRepository.findOne({username});
+
+	if(user && (await bcrypt.compare(password, user.password))) {
+		return 'login success';
+	} else {
+		throw new UnauthorizedException('login Failed')
+	}
+}
+```
+
+**user.controller.ts**
+
+```jsx
+@Post('/signin')
+signIn(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto) {
+    return this.authService.signIn(authCredentialsDto);
+}
+```
