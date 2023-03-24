@@ -299,10 +299,7 @@ JWT (JSON Web Token) : 정보를 안전하게 전할 때 혹은 유저의 권한
 **JWT 사용 흐름**
 
 유저 로그인 → 토큰 생성 → 토큰 보관
-
-                               ↓
-
-<유저 정보 + (Hashing 알고리즘) + Secret Text>
+토큰 생성 : <유저 정보 + (Hashing 알고리즘) + Secret Text>
 
 **예제)**
 
