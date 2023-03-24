@@ -276,3 +276,37 @@ signIn(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto) {
     return this.authService.signIn(authCredentialsDto);
 }
 ```
+---
+
+### JWT에 대하여
+
+JWT (JSON Web Token) : 정보를 안전하게 전할 때 혹은 유저의 권한 같은 것을 체크할 때 사용되는 유용한 모델
+
+**JWT 구조**
+
+1) Header
+
+ 토큰에 대한 메타 데이터 포함 (타입, 해싱 알고리즘 SHA256, RSA …)
+
+2) Payload
+
+ 유저 정보나 만료 기간, 주제 등
+
+3) Verify Signature
+
+ 토큰이 보낸 사람에 의해 서명되었으며 변경되지 않았는지 확인하는데 사용되는 서명.
+
+**JWT 사용 흐름**
+
+유저 로그인 → 토큰 생성 → 토큰 보관
+
+                               ↓
+
+<유저 정보 + (Hashing 알고리즘) + Secret Text>
+
+**예제)**
+
+Admin만 볼 수 있는 글을 보고자 할때 → 요청을 보낼때 보관하고 있던 Token을 Header에 넣어서 같이 보낸다 → 서버에서는 JWT를 이용해서 Token을 다시 생성한 후 두개를 비교. → 통과가되면 Admin 유저가 원하는 글을 볼 수 있도록 처리.
+
+⇒ Client 에서 넘어온 Header + Client에서 넘어온 Payload  + Server에서 가지고 있는 Secret Text로 새로 생성해서 Header에 있던 Token의 Verify Signature와 비교. 일치하면 성공
+---
