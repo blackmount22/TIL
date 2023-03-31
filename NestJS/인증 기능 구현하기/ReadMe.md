@@ -305,7 +305,7 @@ JWT (JSON Web Token) : 정보를 안전하게 전할 때 혹은 유저의 권한
 
 Admin만 볼 수 있는 글을 보고자 할때 → 요청을 보낼때 보관하고 있던 Token을 Header에 넣어서 같이 보낸다 → 서버에서는 JWT를 이용해서 Token을 다시 생성한 후 두개를 비교. → 통과가되면 Admin 유저가 원하는 글을 볼 수 있도록 처리.
 
--> Client 에서 넘어온 Header + Client에서 넘어온 Payload  + Server에서 가지고 있는 Secret Text로 새로 생성해서 Header에 있던 Token의 Verify Signature와 비교. 일치하면 성공
+Client 에서 넘어온 Header + Client에서 넘어온 Payload  + Server에서 가지고 있는 Secret Text로 새로 생성해서 Header에 있던 Token의 Verify Signature와 비교. 일치하면 성공
 ---
 
 ### JWT를 이용해서 토큰 생성하기
