@@ -305,5 +305,57 @@ JWT (JSON Web Token) : 정보를 안전하게 전할 때 혹은 유저의 권한
 
 Admin만 볼 수 있는 글을 보고자 할때 → 요청을 보낼때 보관하고 있던 Token을 Header에 넣어서 같이 보낸다 → 서버에서는 JWT를 이용해서 Token을 다시 생성한 후 두개를 비교. → 통과가되면 Admin 유저가 원하는 글을 볼 수 있도록 처리.
 
-⇒ Client 에서 넘어온 Header + Client에서 넘어온 Payload  + Server에서 가지고 있는 Secret Text로 새로 생성해서 Header에 있던 Token의 Verify Signature와 비교. 일치하면 성공
+-> Client 에서 넘어온 Header + Client에서 넘어온 Payload  + Server에서 가지고 있는 Secret Text로 새로 생성해서 Header에 있던 Token의 Verify Signature와 비교. 일치하면 성공
 ---
+
+### JWT를 이용해서 토큰 생성하기
+
+**필요한 설치 모듈**
+
+@nestjs/jwt : nestjs에서 jwt를 사용하기 위해 필요한 모듈
+
+@nestjs/passport: nestjs에서 passport를 사용하기 위해 필요한 모듈
+
+// passport > passport모듈
+
+// passport-jwt > jwt 모듈
+
+```bash
+$ npm install @nestjs/jwt @nestjs/passport passport passport-jwt --save
+```
+
+1. **auth 모듈 imports에 넣어주기**
+
+```jsx
+@Module({
+	imports: [
+		PassportModule.register({ defaultStrategy: 'jwt'}),
+		JwtModule.register({
+			secret:'Secret1234',
+			signOptions: {
+				expiresIn: 60 * 60,
+			}
+		}),
+	]
+})
+```
+**로그인 성공 시 JWT를 이용해서 토큰 생성해주기 (auth.service.ts)**
+
+```jsx
+async signIn(authCredentialsDto: AuthCredentialsDto): Promise<{accessToken: string}> {
+        const { username, password } = authCredentialsDto;
+        const user = await this.userRepository.findOne({username});
+
+        if(user && (await bcrypt.compare(password, user.password))){
+            // 유저 토큰 생성 ( Secret + Payload )
+            const payload = { username };
+            const accessToken = await this.jwtService.sign(payload); // 알아서 payload + secret 처리로 토큰 생성
+
+            return { accessToken };
+        } else {
+            throw new UnauthorizedException('login Failed')
+        }
+    }
+```
+---
+
