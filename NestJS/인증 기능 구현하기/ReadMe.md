@@ -357,4 +357,119 @@ async signIn(authCredentialsDto: AuthCredentialsDto): Promise<{accessToken: stri
     }
 ```
 ---
+### Passport, JWT 이용해서 토큰 인증 후 유저 정보 가져오기
 
+@types/passport-jwt 모듈 (passport-jwt 모듈을 위한 타입 정의 모듈) 설치
+
+```bash
+npm install @types/passport-jwt --save
+```
+
+**jwt-strategy.ts**
+
+```jsx
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { PassportStrategy } from "@nestjs/passport";
+import { InjectRepository } from "@nestjs/typeorm";
+import { ExtractJwt, Strategy } from "passport-jwt";
+import { User } from "./user.entity";
+import { UserRepository } from "./user.repository";
+
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy){
+    constructor(
+        @InjectRepository(UserRepository)
+        private userRepository: UserRepository
+    ) {
+        super({
+            secretOrKey: 'Secret1234', // 토큰이 유효한지 체크하기 위해
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken() // AuthHeader에서 BearerToken 타입으로 조회해서 유효한지 확인
+        })
+    }
+
+    async validate(payload) {
+        const {username} = payload;
+        const user:User = await this.userRepository.findOne({username});
+
+        if(!user) {
+            throw new UnauthorizedException();
+        }
+
+        return user;
+    }
+}
+```
+
+**요청안에 유저 정보가 들어가게 하는 방법**
+
+**UseGuards (미들웨어)**
+
+useGuards 안에 @nestjs/passport에서 가져온 AuthGuard()를 이용하면 요청안에 
+
+**Tip: 각각의 미들웨어가 불러지는 순서**
+
+```bash
+middleware → guard → interceptor(before) → pipe → controller → service → controller → interceptor(after) → filter (if applicable) → client
+```
+
+```jsx
+@Post('/test')
+@UseGuards(AuthGuard())
+test(@Req() req) {
+    console.log('req', req);
+}
+```
+
+---
+
+### 커스텀 데코레이터 생성하기
+
+**get-user.decorator.ts**
+
+```tsx
+import { createParamDecorator, ExecutionContext } from "@nestjs/common";
+import { User } from "./user.entity";
+
+export const GetUser = createParamDecorator((data, ctx: ExecutionContext): User => {
+    const req = ctx.switchToHttp().getRequest();
+    return req.user;
+})
+```
+
+**auth.controller.ts**
+
+```tsx
+@Post('/test')
+@UseGuards(AuthGuard())
+test(@GetUser() user: User) {
+    console.log('user', user);
+}
+```
+
+---
+
+### 인증된 유저만 게시물 보고 쓸 수 있게 해주기
+
+- 유저에게 게시물 접근 권한 주기
+    1. 인증에 관한 모듈을 board 모듈에서 쓸 수 있어야 하기에 board module에서 인증 모듈 import 해오기 (이렇게 되면 AuthModule에서 export 하는 어떠한 것이든 board Module에서 사용 가능하게 된다.)
+
+**board.module.ts**
+
+```tsx
+imports: [
+    TypeOrmModule.forFeature([BoardRepository]),
+    **AuthModule** // AuthModule 추가로 board Module에서 전체 사용 가능
+  ],
+```
+
+**board.controller.ts**
+
+```tsx
+@Controller('boards')
+**@UseGuards(AuthGuard())** // controller Level에서 UseGuard 미들웨어 추가
+export class BoardsController {
+
+}
+```
+
+---
